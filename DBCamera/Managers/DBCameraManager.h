@@ -213,4 +213,7 @@
  *  This method indicates when the capture session did start
  */
 - (void) captureSessionDidStartRunning;
+
+- (void) cameraIsAdjustingFocus:(BOOL)isAdjustingFocus;
+
 @end

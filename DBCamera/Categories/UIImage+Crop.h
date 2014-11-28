@@ -57,4 +57,7 @@
  *  @return the new UIImage
  */
 + (UIImage *) returnImage:(UIImage *)img withSize:(CGSize)finalSize;
+
++ (UIImage *) croppedImage:(UIImage *)img withRect:(CGRect)rect;
+
 @end

@@ -333,6 +333,13 @@ NSLocalizedStringFromTable(key, @"DBCamera", nil)
     }
 }
 
+- (void)cameraIsAdjustingFocus:(BOOL)isAdjustingFocus {
+    id camera = self.customCamera ?: _cameraView;
+    if ([camera respondsToSelector:@selector(drawFocusBoxWithIsAdjustingFocus:)] ) {
+        [camera drawFocusBoxWithIsAdjustingFocus:isAdjustingFocus];
+    }
+}
+
 #pragma mark - CameraViewDelegate
 
 - (void) cameraViewStartRecording

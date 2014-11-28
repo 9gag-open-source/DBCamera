@@ -14,7 +14,7 @@
 #import "DBCameraLoadingView.h"
 #import "UIImage+TintColor.h"
 
-#import <GPUImage/GPUImage.h>
+#import "GPUImage.h"
 
 #define kFilterCellIdentifier @"filterCell"
 

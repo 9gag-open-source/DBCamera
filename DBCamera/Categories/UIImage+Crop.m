@@ -174,4 +174,15 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, CGFloat oval
     return image;
 }
 
++ (UIImage *) croppedImage:(UIImage *)img withRect:(CGRect)rect
+{
+//    UIGraphicsBeginImageContext(rect.size);
+    UIGraphicsBeginImageContextWithOptions(rect.size, false, [img scale]);
+    [img drawAtPoint:CGPointMake(-rect.origin.x, -rect.origin.y)];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
+}
+
 @end

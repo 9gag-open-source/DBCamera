@@ -129,4 +129,7 @@
  *  @param scale The scale value
  */
 - (void) pinchCameraViewWithScalNum:(CGFloat)scale;
+
+- (void)drawFocusBoxWithIsAdjustingFocus:(BOOL)isAdjustingFocus;
+
 @end

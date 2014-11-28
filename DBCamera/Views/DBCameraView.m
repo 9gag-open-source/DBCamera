@@ -14,8 +14,8 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 
 
-#define previewFrameRetina (CGRect){ 0, 65, 320, 342 }
-#define previewFrameRetina_4 (CGRect){ 0, 65, 320, 430 }
+//#define previewFrameRetina (CGRect){ 0, 65, 320, 342 }
+//#define previewFrameRetina_4 (CGRect){ 0, 65, 320, 430 }
 
 // pinch
 #define MAX_PINCH_SCALE_NUM   3.f
@@ -55,9 +55,11 @@
         _previewLayer = [[AVCaptureVideoPreviewLayer alloc] init];
         if ( captureSession ) {
             [_previewLayer setSession:captureSession];
-            [_previewLayer setFrame: IS_RETINA_4 ? previewFrameRetina_4 : previewFrameRetina ];
-        } else
-            [_previewLayer setFrame:self.bounds];
+//            [_previewLayer setFrame: IS_RETINA_4 ? previewFrameRetina_4 : previewFrameRetina ];
+        } else {
+//            [_previewLayer setFrame:self.bounds];
+        }
+        [_previewLayer setFrame:[self getPreviewFrame]];
         
         if ( [_previewLayer respondsToSelector:@selector(connection)] ) {
             if ( [_previewLayer.connection isVideoOrientationSupported] )
@@ -73,6 +75,11 @@
     }
     
     return self;
+}
+
+- (CGRect)getPreviewFrame {
+     //TODO : always square now, always 216 Y now
+    return CGRectMake(0,20+44+44,self.bounds.size.width,self.bounds.size.width);
 }
 
 - (void) defaultInterface
@@ -106,7 +113,9 @@
 - (UIView *) topContainerBar
 {
     if ( !_topContainerBar ) {
-        _topContainerBar = [[UIView alloc] initWithFrame:(CGRect){ 0, 0, CGRectGetWidth(self.bounds), CGRectGetMinY(IS_RETINA_4 ? previewFrameRetina_4 : previewFrameRetina) }];
+//        _topContainerBar = [[UIView alloc] initWithFrame:(CGRect){ 0, 0, CGRectGetWidth(self.bounds), CGRectGetMinY(IS_RETINA_4 ? previewFrameRetina_4 : previewFrameRetina) }];
+        CGRect previewFrame = [self getPreviewFrame];
+        _topContainerBar = [[UIView alloc] initWithFrame:(CGRect){ 0, 0, previewFrame.size.width, previewFrame.origin.y }];
         [_topContainerBar setBackgroundColor:RGBColor(0x000000, 1)];
     }
     return _topContainerBar;
@@ -115,7 +124,8 @@
 - (UIView *) bottomContainerBar
 {
     if ( !_bottomContainerBar ) {
-        CGFloat newY = CGRectGetMaxY( IS_RETINA_4 ? previewFrameRetina_4 : previewFrameRetina );
+//        CGFloat newY = CGRectGetMaxY( IS_RETINA_4 ? previewFrameRetina_4 : previewFrameRetina );
+        CGFloat newY = CGRectGetMaxY( [self getPreviewFrame] );
         _bottomContainerBar = [[UIView alloc] initWithFrame:(CGRect){ 0, newY, CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds) - newY }];
         [_bottomContainerBar setUserInteractionEnabled:YES];
         [_bottomContainerBar setBackgroundColor:RGBColor(0x000000, 1)];
@@ -203,8 +213,8 @@
         [_gridButton setBackgroundColor:[UIColor clearColor]];
         [_gridButton setImage:[[UIImage imageNamed:@"cameraGrid"] tintImageWithColor:self.tintColor] forState:UIControlStateNormal];
         [_gridButton setImage:[[UIImage imageNamed:@"cameraGrid"] tintImageWithColor:self.selectedTintColor] forState:UIControlStateSelected];
-        [_gridButton setFrame:(CGRect){ 0, 0, 30, 30 }];
-        [_gridButton setCenter:(CGPoint){ CGRectGetMidX(self.topContainerBar.bounds), CGRectGetMidY(self.topContainerBar.bounds) }];
+        [_gridButton setFrame:(CGRect){ 0, 17.5, 30, 30 }];
+        [_gridButton setCenter:(CGPoint){ CGRectGetMidX(self.topContainerBar.bounds), _gridButton.center.y }];
         [_gridButton addTarget:self action:@selector(addGridToCameraAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _gridButton;
@@ -276,6 +286,9 @@
 - (void) drawExposeBoxAtPointOfInterest:(CGPoint)point andRemove:(BOOL)remove
 {
     [self draw:_exposeBox atPointOfInterest:point andRemove:remove];
+}
+- (void)drawFocusBoxWithIsAdjustingFocus:(BOOL)isAdjustingFocus {
+    
 }
 
 #pragma mark - Gestures

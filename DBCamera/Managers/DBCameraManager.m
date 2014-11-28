@@ -7,6 +7,7 @@
 //
 
 #import "DBCameraManager.h"
+#import "UIImage+Crop.h"
 
 @interface DBCameraManager (AVCaptureFileOutputRecordingDelegate) <AVCaptureFileOutputRecordingDelegate>
 @end
@@ -57,6 +58,12 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
+    @try{
+        [_videoInput.device removeObserver:self forKeyPath:@"adjustingFocus"];
+    }@catch(id anException){
+        //do nothing, obviously it wasn't attached because an exception was thrown
+    }
+    
     [_captureSession stopRunning];
     
     _captureSession = nil;
@@ -67,6 +74,9 @@
 - (BOOL) setupSessionWithPreset:(NSString *)sessionPreset error:(NSError **)error
 {
     _videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backCamera] error:error];
+    
+    int flags = NSKeyValueObservingOptionNew;
+    [_videoInput.device addObserver:self forKeyPath:@"adjustingFocus" options:flags context:nil];
     
     _stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
     [_stillImageOutput setOutputSettings:@{ AVVideoCodecKey : AVVideoCodecJPEG }];
@@ -140,6 +150,13 @@
              NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
              UIImage *image = [[UIImage alloc] initWithData:imageData];
              
+             //TODO size handling, now always square
+             if(image.size.height > image.size.width){
+                 image = [UIImage croppedImage:image withRect:CGRectMake(0, (image.size.height-image.size.width)*0.5, image.size.width, image.size.width)];
+             } else {
+                 image = [UIImage croppedImage:image withRect:CGRectMake((image.size.width-image.size.height)*0.5, 0, image.size.height, image.size.height)];
+             }
+             
              CFDictionaryRef metadata = CMCopyDictionaryOfAttachments(NULL, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
              NSDictionary *meta = (__bridge NSDictionary *)(metadata);
              CFRelease(metadata);
@@ -183,13 +200,23 @@
             goto bail;
         
         if ( newVideoInput != nil ) {
+            
             [_captureSession beginConfiguration];
             [_captureSession removeInput:_videoInput];
+            
+            @try{
+                [_videoInput.device removeObserver:self forKeyPath:@"adjustingFocus"];
+            }@catch(id anException){
+                //do nothing, obviously it wasn't attached because an exception was thrown
+            }
             
             if ( [_captureSession canAddInput:newVideoInput] ) {
                 [_captureSession addInput:newVideoInput];
                 
                 _videoInput = newVideoInput;
+                
+                int flags = NSKeyValueObservingOptionNew;
+                [_videoInput.device addObserver:self forKeyPath:@"adjustingFocus" options:flags context:nil];
             } else
                 [_captureSession addInput:_videoInput];
 
@@ -489,6 +516,20 @@ bail:
 - (AVCaptureDevice *)backCamera
 {
     return [self cameraWithPosition:AVCaptureDevicePositionBack];
+}
+
+#pragma mark - Adjust Focus 
+
+// callback
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if( [keyPath isEqualToString:@"adjustingFocus"] ){
+        BOOL adjustingFocus = [ [change objectForKey:NSKeyValueChangeNewKey] isEqualToNumber:[NSNumber numberWithInt:1] ];
+//        NSLog(@"Is adjusting focus? %@", adjustingFocus ? @"YES" : @"NO" );
+//        NSLog(@"Change dictionary: %@", change);
+        if(_delegate && [_delegate respondsToSelector:@selector(cameraIsAdjustingFocus:)]){
+            [_delegate cameraIsAdjustingFocus:adjustingFocus];
+        }
+    }
 }
 
 @end
