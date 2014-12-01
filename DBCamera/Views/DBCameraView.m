@@ -291,6 +291,10 @@
     
 }
 
+- (void)drawFocusBoxForContinuousFocus {
+    
+}
+
 #pragma mark - Gestures
 
 - (void) createGesture

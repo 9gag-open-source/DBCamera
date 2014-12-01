@@ -302,11 +302,29 @@ NSLocalizedStringFromTable(key, @"DBCamera", nil)
 {
     id camera = self.customCamera ?: _cameraView;
     CGRect bounds = [(UIView *)camera bounds];
-    CGPoint screenCenter = (CGPoint){ CGRectGetMidX(bounds), CGRectGetMidY(bounds) };
-    if ([camera respondsToSelector:@selector(drawFocusBoxAtPointOfInterest:andRemove:)] )
-        [camera drawFocusBoxAtPointOfInterest:screenCenter andRemove:NO];
-    if ( [camera respondsToSelector:@selector(drawExposeBoxAtPointOfInterest:andRemove:)] )
-        [camera drawExposeBoxAtPointOfInterest:screenCenter andRemove:NO];
+    //CGPoint screenCenter = (CGPoint){ CGRectGetMidX(bounds), CGRectGetMidY(bounds) };
+    
+    float x = [camera previewLayer].frame.origin.x + [[camera previewLayer] frame].size.width / 2;
+    float y = [camera previewLayer].frame.origin.y + [[camera previewLayer] frame].size.height / 2;
+    CGPoint previewCenter = CGPointMake(x, y);
+    
+    NSLog(@"preview center=%f %f", x, y);
+    NSLog(@"screen center x=%f, y=%f", CGRectGetMidX(bounds),  CGRectGetMidY(bounds));
+    
+//    
+//    if ([camera respondsToSelector:@selector(drawFocusBoxAtPointOfInterest:andRemove:)] ) {
+//        [camera drawFocusBoxAtPointOfInterest:previewCenter andRemove:NO];
+//    }
+//    if ( [camera respondsToSelector:@selector(drawExposeBoxAtPointOfInterest:andRemove:)] ) {
+//        [camera drawExposeBoxAtPointOfInterest:previewCenter andRemove:NO];
+//    }
+    
+    if ([camera respondsToSelector:@selector(drawFocusBoxForContinuousFocus)] ) {
+        [camera drawFocusBoxForContinuousFocus];
+    }
+        
+    
+    [[self cameraManager] setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
 }
 
 - (void) openLibrary
@@ -331,9 +349,12 @@ NSLocalizedStringFromTable(key, @"DBCamera", nil)
             [[[UIAlertView alloc] initWithTitle:DBCameraLocalizedStrings(@"general.error.title") message:DBCameraLocalizedStrings(@"pickerimage.nopolicy") delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil] show];
         });
     }
+    
+    
 }
 
 - (void)cameraIsAdjustingFocus:(BOOL)isAdjustingFocus {
+    
     id camera = self.customCamera ?: _cameraView;
     if ([camera respondsToSelector:@selector(drawFocusBoxWithIsAdjustingFocus:)] ) {
         [camera drawFocusBoxWithIsAdjustingFocus:isAdjustingFocus];

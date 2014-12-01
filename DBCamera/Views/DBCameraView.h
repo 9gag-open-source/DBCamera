@@ -132,4 +132,6 @@
 
 - (void)drawFocusBoxWithIsAdjustingFocus:(BOOL)isAdjustingFocus;
 
+- (void)drawFocusBoxForContinuousFocus;
+
 @end
