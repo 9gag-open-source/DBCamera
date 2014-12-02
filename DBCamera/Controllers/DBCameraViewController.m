@@ -245,8 +245,10 @@ NSLocalizedStringFromTable(key, @"DBCamera", nil)
 
 - (void) switchCamera
 {
-    if ( [self.cameraManager hasMultipleCameras] )
+    if ( [self.cameraManager hasMultipleCameras] ) {
         [self.cameraManager cameraToggle];
+        [self resetCameraFocus];
+    }
 }
 
 - (void) cameraView:(UIView *)camera showGridView:(BOOL)show {
@@ -300,6 +302,10 @@ NSLocalizedStringFromTable(key, @"DBCamera", nil)
 
 - (void) captureSessionDidStartRunning
 {
+    [self resetCameraFocus];
+}
+
+- (void) resetCameraFocus {
     id camera = self.customCamera ?: _cameraView;
     CGRect bounds = [(UIView *)camera bounds];
     //CGPoint screenCenter = (CGPoint){ CGRectGetMidX(bounds), CGRectGetMidY(bounds) };
@@ -308,8 +314,8 @@ NSLocalizedStringFromTable(key, @"DBCamera", nil)
     float y = [camera previewLayer].frame.origin.y + [[camera previewLayer] frame].size.height / 2;
     CGPoint previewCenter = CGPointMake(x, y);
     
-    NSLog(@"preview center=%f %f", x, y);
-    NSLog(@"screen center x=%f, y=%f", CGRectGetMidX(bounds),  CGRectGetMidY(bounds));
+    //NSLog(@"preview center=%f %f", x, y);
+    //NSLog(@"screen center x=%f, y=%f", CGRectGetMidX(bounds),  CGRectGetMidY(bounds));
     
 //    
 //    if ([camera respondsToSelector:@selector(drawFocusBoxAtPointOfInterest:andRemove:)] ) {

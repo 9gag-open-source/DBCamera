@@ -304,8 +304,8 @@ bail:
         if ( [device lockForConfiguration:&error] ) {
             device.focusPointOfInterest = point;
             device.focusMode = AVCaptureFocusModeAutoFocus;
-            NSLog(@"focusAtPoint at x=%f, y=%f", point.x, point.y);
-            NSLog(@"focusAtPoint focusMode=%ld", AVCaptureFocusModeAutoFocus);
+            //NSLog(@"focusAtPoint at x=%f, y=%f", point.x, point.y);
+            //NSLog(@"focusAtPoint focusMode=%ld", AVCaptureFocusModeAutoFocus);
             [device unlockForConfiguration];
         } else {
             if ( [_delegate respondsToSelector:@selector(acquiringDeviceLockFailedWithError:)] )
@@ -428,7 +428,7 @@ bail:
 - (void) setFocusMode:(AVCaptureFocusMode)focusMode
 {
     AVCaptureDevice *device = _videoInput.device;
-    NSLog(@"setFocusMode old=%ld,  new=%ld", device.focusMode, focusMode);
+    //NSLog(@"setFocusMode old=%ld,  new=%ld", device.focusMode, focusMode);
     
     if ([device isFocusModeSupported:focusMode] && device.focusMode != focusMode) {
         NSError *error;
@@ -529,7 +529,7 @@ bail:
     if( [keyPath isEqualToString:@"adjustingFocus"] ){
         BOOL adjustingFocus = [ [change objectForKey:NSKeyValueChangeNewKey] isEqualToNumber:[NSNumber numberWithInt:1] ];
 
-        NSLog(@"Is adjusting focus? %@", adjustingFocus ? @"YES" : @"NO" );
+        //NSLog(@"Is adjusting focus? %@", adjustingFocus ? @"YES" : @"NO" );
 //        NSLog(@"Change dictionary: %@", change);
         if(_delegate && [_delegate respondsToSelector:@selector(cameraIsAdjustingFocus:)]){
             [_delegate cameraIsAdjustingFocus:adjustingFocus];
